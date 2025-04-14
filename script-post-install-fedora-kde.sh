@@ -55,6 +55,9 @@ flatpak install -y flathub com.github.wwmm.easyeffects
 echo "Installing apps from fedora repositories"
 sudo dnf install -y git discord telegram-desktop piper ckb-next direnv stacer plasma-browser-integration nano kvantum poetry vlc cascadia-fonts-all
 
+# Configure direnv
+echo "eval \"\$(direnv hook bash)\"" >> ~/.bashrc
+
 #######################################################
 # Install ASDF-VM
 #######################################################
