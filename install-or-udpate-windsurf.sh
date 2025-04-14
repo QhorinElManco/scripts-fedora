@@ -2,10 +2,11 @@
 set -e
 
 DOWNLOADS_DIR="$HOME/Descargas"
+INSTALL_DIR="$HOME/.local/share/windsurf"
 DESKTOP_ENTRY="$HOME/.local/share/applications/windsurf.desktop"
 
 echo "Searching for newest Windsurf tarball in $DOWNLOADS_DIR..."
-tarball=$(ls -t "$DOWNLOADS_DIR"/Windsurf*.tar* 2 >/dev/null | head -n1)
+tarball=$(ls -t "$DOWNLOADS_DIR"/Windsurf*.tar* 2>/dev/null | head -n1)
 if [ -z "$tarball" ]; then
     echo "No Windsurf tarball found in $DOWNLOADS_DIR."
     exit 1
@@ -44,16 +45,16 @@ fi
 echo ""
 
 echo "Moving existing Windsurf folder to windsurf_old for later deletion..."
-if [ -d "$HOME/windsurf" ]; then
-    mv "$HOME/windsurf" "$HOME/windsurf_old"
+if [ -d "$INSTALL_DIR" ]; then
+    mv "$INSTALL_DIR" "${INSTALL_DIR}_old"
     echo "Existing folder moved to windsurf_old."
 fi
 
 echo ""
 
 echo "Moving new Windsurf folder to HOME..."
-mv "$extracted_dir" "$HOME/windsurf"
-rm -rf "$HOME/windsurf_old"
+mv "$extracted_dir" "$INSTALL_DIR"
+rm -rf "${INSTALL_DIR}_old"
 echo "Windsurf folder updated."
 
 echo ""
@@ -74,8 +75,8 @@ else
 [Desktop Entry]
 Type=Application
 Name=Windsurf
-Exec=${HOME}/windsurf/windsurf
-Icon=${HOME}/windsurf/resources/app/resources/linux/code.png
+Exec=$INSTALL_DIR/windsurf
+Icon=$INSTALL_DIR/resources/app/resources/linux/code.png
 Terminal=false
 Categories=Utility;
 EOF
@@ -90,8 +91,16 @@ rm -rf "$temp_dir"
 echo "Updating desktop database..."
 update-desktop-database ~/.local/share/applications/
 
-echo "Adding Windsurf to PATH..."
-export PATH=$PATH:$HOME/windsurf/bin
+echo ""
+read -p "Do you want to add Windsurf to the path to run it from anywhere? (y/n):" add_to_path
+
+if [[ "$add_to_path" =~ ^[Yy]$ ]]; then
+    echo 'export PATH=$PATH:$HOME/.local/share/windsurf/bin' >> ~/.bashrc
+    source ~/.bashrc
+    echo "Windsurf has been added to the path. Restart your terminal to apply the changes."
+else
+    echo "Windsurf did not add to the path. You can do it manually later if you wish."
+fi
 
 echo ""
 echo "Installation/update complete."
